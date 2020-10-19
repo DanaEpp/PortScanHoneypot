@@ -7,6 +7,7 @@
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=pshp-github&metric=bugs)](https://sonarcloud.io/dashboard?id=pshp-github)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=pshp-github&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=pshp-github)
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=pshp-github&metric=code_smells)](https://sonarcloud.io/dashboard?id=pshp-github)
+
 This tool helps blue teams detect bad actors who may be port scanning the network, and allows red teams to practice honeypot evasion. 
 
 #blueteam vs #redteam = #FTW
@@ -27,4 +28,47 @@ python3 -portscanhoneypot
 
 **#redteam TIP** : When considering honeypot evasion, #blueteams might run these types of detection tools in dedicated containers standalone. Watch for DNS and NETBIOS chatter.... consider avoiding scanning hosts that aren't interacting with other hosts... they might just be a honeypot.
 
-**#bountyhunter TIP** : Be loud and proud. You are not trying to evade port scan detectors. If the host is in scope and allows for port scanning, then go to town. Light up #blueteam's logs and see if they contact you. :-)  
+**#bountyhunter TIP** : Be loud and proud. You are not trying to evade port scan detectors. If the host is in scope and allows for port scanning, then go to town. Light up #blueteam's logs and see if they contact you. :-) 
+
+## Webhooks support
+To assist in notifying your team when port scans are detected consider using webhook notifications.
+
+You can configure your webhooks in the `pshp.conf` file:
+
+```
+webhook_url: "https://your.url/to/your/webhook"
+webhook_type: 0
+```
+
+You can set `webhook_type` to any of the following numbers:
+* 0 : NONE
+* 1 : GENERIC
+* 2 : SLACK
+* 3 : MS TEAMS
+* 4 : DISCORD
+
+For more information on setting up webhook notifications for your favorite apps please see:
+* **Slack** : [Detailed instructions](https://api.slack.com/messaging/webhooks). To setup your first one [go here](https://my.slack.com/services/new/incoming-webhook/).
+* **Microsoft Teams** : [Detailed instructions](https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook)
+* **Discord** : [Detailed instructions](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks)
+
+### Working with generic webhooks like Microsoft Logic Apps
+If you are wanting to get notifications to a different device or email, consider using the "generic" webhook option and configure it to point to a [Microsoft Logic App](https://azure.microsoft.com/en-us/services/logic-apps/). When defining the HTTP receive endpoint in Azure use the following Request Body JSON Schema:
+
+```
+{
+    "properties": {
+        "content": {
+            "type": "string"
+        },
+        "username": {
+            "type": "string"
+        }
+    },
+    "type": "object"
+}
+```
+
+By defining it in that way, the Logic App will parse out the payload and allow direct dynamic content variables for use in your workflow. From there you can do anything with the payload, from sending it via SMS to your phone or directly to email.
+
+Have fun with it. Generic webhooks and Logic Apps can do some pretty powerful things.
