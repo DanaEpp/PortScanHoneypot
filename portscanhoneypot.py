@@ -64,7 +64,7 @@ class PortScanHoneyPot:
         if settings.webhook and settings.webhook_type != WebHookType.NONE :
             self.__webhook = WebHook(settings.webhook, settings.webhook_type)
         else:
-            self.__webhook = None            
+            self.__webhook = None  
 
     @classmethod
     def print_banner(cls):

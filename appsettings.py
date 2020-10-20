@@ -10,12 +10,17 @@ import validators
 class AppSettings:
     def __init__(self, daemon=False, settingsfile='/etc/pshp.conf', logfile='/var/log/pshp.log'):
 
+        self.iface = 'lo'
         self.listening_ips = []
+        self.listening_ports = []
         self.allowed_hosts = []
         self.daemon = daemon
 
+        if settingsfile is None:
+            settingsfile = '/etc/pshp.conf'
+
         # Check to see if we have a config file to work with
-        if settingsfile != None and os.path.isfile(settingsfile):
+        if os.path.isfile(settingsfile):
             self.__load_settings(settingsfile)
         else:
             msg = "Valid config file not detected. Using defaults."
@@ -36,23 +41,9 @@ class AppSettings:
             try:
                 settings = yaml.safe_load(stream)
 
-                if 'iface' in settings:
-                    self.iface = settings['iface']
-                else:
-                    logging.warning( "'iface' settings missing from config. Using defaults.")
-                    self.iface = 'eth0'
-
-                if 'ports' in settings:
-                    self.listening_ports = settings['ports']
-                else:
-                    logging.warning( "'ports' settings missing from config. Using defaults.")
-                    self.listening_ports = [8080]
-
-                if 'allowed_hosts' in settings:
-                    self.allowed_hosts = settings['allowed_hosts']
-                else:
-                    logging.warning( "'allowed_hosts' settings missing from config. Using defaults.")
-                    self.allowed_hosts = []
+                self.iface = self.__assign_value( settings, "iface", "eth0" )
+                self.listening_ports = self.__assign_value( settings, "ports", [8080] )
+                self.allowed_hosts = self.__assign_value( settings, "allowed_hosts", [] )
 
                 if 'webhook_url' in settings:
                     url = settings['webhook_url']
@@ -60,10 +51,7 @@ class AppSettings:
                     # If there is a bad URL, just drop webhook support
                     if validators.url(url):
                         self.webhook = url
-                        if 'webhook_type' in settings:
-                            self.webhook_type = settings['webhook_type']
-                        else:
-                            self.webhook_type = WebHookType.GENERIC
+                        self.webhook_type = self.__assign_value( settings, "webhook_type", WebHookType.GENERIC )
                     else:
                         logging.warning( "Bad webhook URL. Disabling webhook support." )
                         self.webhook = None
@@ -74,6 +62,14 @@ class AppSettings:
             except yaml.YAMLError as exc:
                 logging.exception(exc)
                 self.__set_defaults()
+
+    def __assign_value(self, settings, key, default_val ):                
+        if key in settings:
+            val = settings[key]
+        else:
+            logging.warning( f"'{key}' settings missing from config. Using defaults.")
+            val = default_val
+        return val
 
     def __set_defaults(self):
         self.iface = 'eth0'
