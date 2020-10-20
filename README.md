@@ -12,6 +12,20 @@ This tool helps blue teams detect bad actors who may be port scanning the networ
 
 #blueteam vs #redteam = #FTW
 
+## Install
+Install using:
+```bash
+git clone https://github.com/DanaEpp/PortScanHoneypot.git 
+cd PortScanHoneypot
+pip3 install -r requirements.txt
+```
+Dependencies will be installed and `portscanhoneypot` will be added to your path.
+
+If you wish to run this as a daemon, you may want to copy the pshp.conf file to /etc. Otherwise you will need to use the `-c` switch to point to the config file.
+```bash
+sudo cp pshp.conf /etc/pshp.conf
+```
+
 ## Usage
 ```bash 
 python3 portscanhoneypot  
