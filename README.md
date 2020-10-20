@@ -14,7 +14,7 @@ This tool helps blue teams detect bad actors who may be port scanning the networ
 
 ## Usage
 ```bash 
-python3 -portscanhoneypot  
+python3 portscanhoneypot  
         [-c /path/to/config.conf] [-d] [--daemon]
 ```
 
@@ -28,7 +28,7 @@ python3 -portscanhoneypot
 
 **#redteam TIP** : When considering honeypot evasion, #blueteams might run these types of detection tools in dedicated containers standalone. Watch for DNS and NETBIOS chatter.... consider avoiding scanning hosts that aren't interacting with other hosts... they might just be a honeypot.
 
-**#bountyhunter TIP** : Be loud and proud. You are not trying to evade port scan detectors. If the host is in scope and allows for port scanning, then go to town. Light up #blueteam's logs and see if they contact you. :-) 
+**#bugbountyhunter TIP** : Be loud and proud. You are not trying to evade port scan detectors. If the host is in scope and allows for port scanning, then go to town. Light up #blueteam's logs and see if they contact you. :-) 
 
 ## Webhooks support
 To assist in notifying your team when port scans are detected consider using webhook notifications.
