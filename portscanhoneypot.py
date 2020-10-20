@@ -57,6 +57,7 @@ class PortScanHoneyPot:
         self.__iface = settings.iface
         self.__listening_ips = settings.listening_ips
         self.__listening_ports = settings.listening_ports
+        self.__allowed_hosts = settings.allowed_hosts
         self.__logfile = settings.portscanlog
 
         # Setup optional webhook for notifications
@@ -179,16 +180,18 @@ class PortScanHoneyPot:
 
     # Process scanner packets tripped up by the honeypot
     def __process_scanner_packet(self, flags, s_addr, d_addr, d_port):
-        scan_type = self.get_scan_type(flags)
-        flags_str = self.get_flags(flags)
-        msg = f"[{get_timestamp()}] {scan_type} scan (flags:{flags_str}) detected from {str(s_addr)} to {str(d_addr)}:{str(d_port)}"
-        self.write_log(msg)
+        # We want to make sure we drop packets from allowed hosts (ie: RMM/NM/Network scanners etc)
+        if s_addr not in self.__allowed_hosts:
+            scan_type = self.get_scan_type(flags)
+            flags_str = self.get_flags(flags)
+            msg = f"[{get_timestamp()}] {scan_type} scan (flags:{flags_str}) detected from {str(s_addr)} to {str(d_addr)}:{str(d_port)}"
+            self.write_log(msg)
 
-        if self.__webhook:
-            self.__webhook.notify(msg)
+            if self.__webhook:
+                self.__webhook.notify(msg)
 
-        if not self.__daemon:
-            print( msg )
+            if not self.__daemon:
+                print( msg )
 
     def get_scan_type(self, flags):
         # TCP flags to scan type mapping

@@ -11,6 +11,7 @@ class AppSettings:
     def __init__(self, daemon=False, settingsfile='/etc/pshp.conf', logfile='/var/log/pshp.log'):
 
         self.listening_ips = []
+        self.allowed_hosts = []
         self.daemon = daemon
 
         # Check to see if we have a config file to work with
@@ -46,6 +47,12 @@ class AppSettings:
                 else:
                     logging.warning( "'ports' settings missing from config. Using defaults.")
                     self.listening_ports = [8080]
+
+                if 'allowed_hosts' in settings:
+                    self.allowed_hosts = settings['allowed_hosts']
+                else:
+                    logging.warning( "'allowed_hosts' settings missing from config. Using defaults.")
+                    self.allowed_hosts = []
 
                 if 'webhook_url' in settings:
                     url = settings['webhook_url']
